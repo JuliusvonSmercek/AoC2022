@@ -1,0 +1,136 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+long long solve(vector<string> &lines);
+
+int main(int argc, char **argv) {
+  ios::sync_with_stdio(false);
+  if (argc != 2) {
+    cerr << "error: missing input file" << endl;
+    exit(0);
+  }
+  ifstream infile(argv[1]);
+
+  string line;
+  vector<string> lines;
+  while (getline(infile, line, '\n')) { // THIS WORKS ONLY FOR LF NOT CRLF !!!
+    lines.push_back(line);
+  }
+  cout << solve(lines) << endl;
+}
+
+template <typename T>
+ostream &operator<<(ostream &os, const vector<T> &container) {
+  os << '[';
+  bool isNotFirst = false;
+  for (const auto &data : container) {
+    if (isNotFirst) os << ", ";
+    isNotFirst = true;
+    os << data;
+  }
+  os << ']';
+  return os;
+}
+
+template <typename T>
+ostream &operator<<(ostream &os, const list<T> &container) {
+  os << '[';
+  bool isNotFirst = false;
+  for (const auto &data : container) {
+    if (isNotFirst) os << ", ";
+    isNotFirst = true;
+    os << data;
+  }
+  os << ']';
+  return os;
+}
+
+template <typename F, typename G>
+ostream &operator<<(ostream &os, const set<F, G> &container) {
+  os << '{';
+  bool isNotFirst = false;
+  for (const auto &data : container) {
+    if (isNotFirst) os << ", ";
+    isNotFirst = true;
+    os << data;
+  }
+  os << '}';
+  return os;
+}
+
+template <typename F, typename G>
+ostream &operator<<(ostream &os, const map<F, G> &container) {
+  os << '[';
+  bool isNotFirst = false;
+  for (const auto &[k, v] : container) {
+    if (isNotFirst) os << ", ";
+    isNotFirst = true;
+    os << k << ": " << v;
+  }
+  os << ']';
+  return os;
+}
+
+template <typename T>
+ostream &operator<<(ostream &os, const stack<T> &container) {
+  os << '<';
+  bool isNotFirst = false;
+  while (!container.empty()) {
+    if (isNotFirst) os << ", ";
+    isNotFirst = true;
+    os << container.top();
+    container.pop();
+  }
+  os << '>';
+  return os;
+}
+
+template <typename T>
+ostream &operator<<(ostream &os, const queue<T> &container) {
+  os << '<';
+  bool isNotFirst = false;
+  while (!container.empty()) {
+    if (isNotFirst) os << ", ";
+    isNotFirst = true;
+    os << container.front();
+    container.pop();
+  }
+  os << '>';
+  return os;
+}
+
+template <typename F, typename G>
+ostream &operator<<(ostream &os, const pair<F, G> &container) {
+  os << '(';
+  os << get<0>(container);
+  os << ", ";
+  os << get<1>(container);
+  os << ')';
+  return os;
+}
+
+template <typename T>
+vector<vector<T>> readInput(const vector<string> &lines) {
+  vector<vector<T>> result;
+  vector<T> temp;
+  for (const string &line : lines) {
+    if (0 == line.size()) {
+      if (0 < temp.size()) {
+        result.push_back(temp);
+      }
+      temp.clear();
+    } else {
+      stringstream ss(line);
+      T item;
+      while (ss >> item) temp.push_back(item);
+    }
+  }
+  if (0 < temp.size()) {
+    result.push_back(temp);
+  }
+  return result;
+}
+
+bool isNumber(const string &string) {
+  return !string.empty() && all_of(string.begin(), string.end(), ::isdigit);
+}
