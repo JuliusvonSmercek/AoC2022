@@ -138,3 +138,13 @@ vector<vector<char>> readMatrix(const vector<string> &lines) {
       result[row][col] = lines[row][col];
   return result;
 }
+
+set<char> chars(const string &str) { return set<char>(str.begin(), str.end()); }
+
+template <typename F, typename G>
+vector<char> intersection(const F &container1, const G &container2) {
+  vector<char> result;
+  set_intersection(container1.begin(), container1.end(), container2.begin(),
+                   container2.end(), std::back_inserter(result));
+  return result;
+}
