@@ -26,7 +26,7 @@ long long solve(vector<string> &lines) {
         for (const auto &[x, y] : {pii(ox - 1, oy), pii(ox + 1, oy),
                                    pii(ox, oy - 1), pii(ox, oy + 1)})
           if (0 <= x && x < X && 0 <= y && y < Y)
-            if (data[oy][ox] - data[y][x] <= 1)
+            if (data[y][x] <= 1 + data[oy][ox])
               result.push_back({zip(X, x, y), 1});
         return result;
       },
