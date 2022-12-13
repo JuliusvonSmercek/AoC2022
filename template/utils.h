@@ -1,15 +1,36 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define cin ss
+typedef long long ll;
+typedef long long ull;
+typedef pair<int, int> pii;
+
+// TODO: printQ
+// TODO: split, splitLines
+// TODO: multiple samples
+
 long long solve(vector<string> &lines);
+
+bool isSample;
 
 int main(int argc, char **argv) {
   ios::sync_with_stdio(false);
   if (argc != 2) {
     cerr << "error: missing input file" << endl;
-    exit(0);
+    return 1;
+  } else if ("./sample.txt" != string(argv[1]) &&
+             "./input.txt" != string(argv[1])) {
+    cerr << "error: input file should be './sample.txt' or './inut.txt'"
+         << endl;
+    return 1;
   }
+  isSample = ("./sample.txt" == string(argv[1]));
   ifstream infile(argv[1]);
+  if (!infile) {
+    cerr << "error opening file" << endl;
+    return 1;
+  }
 
   string line;
   vector<string> lines;
@@ -17,6 +38,7 @@ int main(int argc, char **argv) {
     lines.push_back(line);
   }
   cout << solve(lines) << endl;
+  infile.close();
 }
 
 template <typename T>
@@ -137,4 +159,69 @@ vector<vector<char>> readMatrix(const vector<string> &lines) {
     for (size_t col = 0; col < lines[row].size(); ++col)
       result[row][col] = lines[row][col];
   return result;
+}
+
+set<char> chars(const string &str) { return set<char>(str.begin(), str.end()); }
+
+template <typename F, typename G>
+vector<char> intersection(const F &container1, const G &container2) {
+  vector<char> result;
+  set_intersection(container1.begin(), container1.end(), container2.begin(),
+                   container2.end(), std::back_inserter(result));
+  return result;
+}
+
+template <typename T>
+set<T> range(const T a, const T b) {
+  set<T> result;
+  for (T i = a; i <= b; ++i) {
+    result.insert(i);
+  }
+  return result;
+}
+
+vector<string> split(const string &str, const string &delimiter = " ") {
+  vector<string> result;
+  size_t last = 0, next = 0;
+  while ((next = str.find(delimiter, last)) != string::npos) {
+    result.push_back(str.substr(last, next - last));
+    last = next + 1;
+  }
+  result.push_back(str.substr(last));
+  return result;
+}
+
+void printQ(queue<ll> q) {
+  vector<ll> v;
+  while (!q.empty()) {
+    v.emplace_back(move(q.front()));
+    q.pop();
+  }
+  cout << v << endl;
+}
+
+vector<ll> dijkstra(const function<vector<pair<int, ll>>(int)> neighbours,
+                    const int N, const int start) {
+  vector<ll> dist(N, numeric_limits<ll>::max() / 2);
+  priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>>
+      pq;
+
+  pq.push({0, start});
+  while (pq.size()) {
+    ll d;
+    int v;
+    tie(d, v) = pq.top();
+    pq.pop();
+    if (dist[v] <= d) continue;
+    dist[v] = d;
+    for (const auto &[id, distance] : neighbours(v))
+      pq.push({d + distance, id});
+  }
+  return dist;
+}
+
+int zip(const int N, const int x, const int y) { return N * y + x; }
+
+pair<int, int> unzip(const int N, const int vertex) {
+  return {vertex % N, vertex / N};
 }
