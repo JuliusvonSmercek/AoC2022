@@ -8,5 +8,5 @@ compileFast() { # -O2 not used for compile speed
 }
 
 nimc() {
-  nim c -o:program.out -d:release $1 && find . -type f -name "*.txt" -printf '%f\t%p\n' | sort -r -V -k1 | cut -d$'\t' -f2 | tr '\n' '\0' | xargs -r0 -I {} ./a {} && rm program.out
+  nim c -o:program.out -d:release $1 && find . -type f -name "*.txt" -printf '%f\t%p\n' | sort -r -V -k1 | cut -d$'\t' -f2 | tr '\n' '\0' | xargs -r0 -I {} ./program.out {} && rm program.out
 }
