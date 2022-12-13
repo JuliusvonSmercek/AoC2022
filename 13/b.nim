@@ -1,4 +1,4 @@
-import strutils, algorithm
+import utils, strutils, algorithm
 
 type
   ItemKind = enum List, Value
@@ -80,14 +80,11 @@ proc `<`(left, right: Item): bool = (left <=> right) == Right
 proc `==`(left, right: Item): bool = (left <=> right) == Undef
 
 let
-  file: File = open("input.txt")
-  input: string = file.readAll()
-  items: seq[string] = input.split("\n\n")
-
   it2 = mkList mkList mkValue 2
   it6 = mkList mkList mkValue 6
 
 var its = @[it2, it6]
+var items = load().split("\n\n")
 for temp in items:
   let item = temp.split("\n")
   its.add toItem(item[0])

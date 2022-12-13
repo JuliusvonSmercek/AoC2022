@@ -1,4 +1,4 @@
-import strutils
+import utils, strutils
 
 type
   ItemKind = enum List, Value
@@ -79,12 +79,8 @@ proc `<`(left, right: Item): bool = (left <=> right) == Right
 
 proc `==`(left, right: Item): bool = (left <=> right) == Undef
 
-let
-  file: File = open("input.txt")
-  input: string = file.readAll()
-  items: seq[string] = input.split("\n\n")
-
 var sum = 0
+var items = load().split("\n\n")
 for index, temp in items:
   let item = temp.split("\n")
   if toItem(item[0]) < toItem(item[1]):
