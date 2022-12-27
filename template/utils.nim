@@ -1,4 +1,14 @@
-import std/[algorithm, heapqueue, sequtils, sugar, strutils, os, deques]
+import std/[algorithm, heapqueue, sequtils, sugar, strutils, os, deques, typetraits, macros]
+
+template unroll*(iter, name0, body0: untyped): untyped =
+  macro unrollImpl(name, body) =
+    result = newStmtList()
+    for a in iter:
+      result.add(newBlockStmt(newStmtList(
+        newConstStmt(name, newLit(a)),
+        copy body
+      )))
+  unrollImpl(name0, body0)
 
 var isInput*: bool = false
 
@@ -52,7 +62,49 @@ proc dijkstra*(neighbours: (int) -> seq[(int, int)], V, start: int, ends: seq[in
     dists[v] = d
     for (id, distance) in neighbours(v):
       pq.push (d + distance, id)
-  return (-1, high(int))
+  result[1] = high(int)
+
+proc zip*[T: tuple](V, pos: T): int =
+  var i: int
+  result = pos[T.arity - 1]
+  unroll(countdown(T.arity - 2, 0), i):
+    result *= V[i]
+    result += pos[i]
+
+proc multiply(value: tuple) : int = 
+  result = 1
+  for item in value.fields:
+    result *= item
+
+proc multiDimdijkstra*[T: tuple](neighbours: (T) -> seq[(T, int)], V: T, start: T, ends: seq[T]): (T, int) =
+  let newEnds = ends.mapIt(V.zip(it))
+  var dists = newSeqWith[int](multiply V, high(int))
+  var pq = [(0, start)].toHeapQueue
+
+  while 0 < pq.len():
+    let (d, v) = pq.pop()
+    let zipped = V.zip(v)
+    if zipped in newEnds: return (v, d)
+    if dists[zipped] <= d: continue
+    dists[zipped] = d
+    for (id, distance) in neighbours(v):
+      pq.push (d + distance, id)
+  result[1] = high(int)
+
+# proc `<`(a, b: tuple) : bool = a[0] < b[0]
+
+# proc aStar*(neighbours: (int) -> seq[(int, int)], heuristic: (int) -> int, V, start: int, ends: seq[int]): (int, int) =
+#   var dists = newSeqWith[int](V, high(int))
+#   var pq = [(heuristic(start), 0, start)].toHeapQueue
+
+#   while 0 < pq.len():
+#     let (_, d, v) = pq.pop()
+#     if v in ends: return (v, d)
+#     if dists[v] <= d: continue
+#     dists[v] = d
+#     for (id, distance) in neighbours(v):
+#       pq.push (d + distance + heuristic(id), d + distance, id)
+#   return (-1, high(int))
 
 proc bfs*(neighbours: (int) -> seq[int], V, start: int): seq[int] = dijkstra(injectDist neighbours, V, start)
 
