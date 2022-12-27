@@ -5,7 +5,6 @@ let
   X = lines[0].len
   Y = lines.len
   timeSteps = lcm(X, Y)
-  V = X * Y * timeSteps * 3
   startPos = (lines[0].find("."), 0)
   endPos = (lines[Y - 1].find("."), Y - 1)
 
@@ -13,16 +12,6 @@ let
     for y, line in lines.toMatrix:
       for x, c in line:
         if c in @['^', '>', 'v', '<']: (c, x, y)
-
-type
-  State = enum Goal = 0, Back = 1, AgainGoal = 2
-
-  # x, y, time
-  Pos = (int, int, int, State) # distinct
-
-proc zip*(pos: Pos): int = pos[0] + pos[1] * X + pos[2] * X * Y + (int pos[3]) * X * Y * timeSteps
-
-proc unzip*(value: int): Pos = (value mod X, (value div X) mod Y, (value div (X * Y)) mod timeSteps, State (value div (X * Y * timeSteps)))
 
 proc simulate(blizzard: (char, int, int), time: int): (int, int) =
   let (direction, x, y) = blizzard
@@ -37,19 +26,15 @@ proc simulate(blizzard: (char, int, int), time: int): (int, int) =
   return res
 
 let blizzardsAt = (0..<timeSteps).mapIt(blizzards.map(blizzard => blizzard.simulate(it)))
-proc neighbours(vertex: int): seq[int] =
-  let (x, y, time, oldState) = unzip(vertex)
-  let state =
-    if (oldState == Goal and (x, y) == endPos) or (oldState == Back and (x, y) == startPos):
-      State ((int oldState) + 1)
-    else:
-      oldState
+proc neighbours(vertex: (int, int, int, int)): seq[((int, int, int, int), int)] =
+  let (x, y, time, oldState) = vertex
+  let state = oldState + (if (oldState == 0 and (x, y) == endPos) or (oldState == 1 and (x, y) == startPos): 1 else: 0)
   let newTime = (time + 1) mod timeSteps
   return collect(newSeq):
     for (x, y) in @[(x, y), (x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]:
       if (x, y) == startPos or (x, y) == endPos or (1 <= x and x < X - 1 and 1 <= y and y < Y - 1):
         if (x, y) notin blizzardsAt[newTime]:
-          zip (x, y, newTime, state)
+          ((x, y, newTime, state), 1)
 
-let ends = (0..<timeSteps).mapIt(zip (endPos[0], endPos[1], it, AgainGoal))
-echo bfs(neighbours, V, zip (startPos[0], startPos[1], 0, Goal), ends)[1]
+let ends = (0..<timeSteps).mapIt((endPos[0], endPos[1], it, 2))
+echo multiDimDijkstra(neighbours, (X, Y, timeSteps, 3), (startPos[0], startPos[1], 0, 0), ends)[1]
